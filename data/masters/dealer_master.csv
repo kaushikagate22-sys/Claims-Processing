@@ -1,0 +1,23 @@
+dealer_code,dealer_name,region,city,status,credit_status
+D001,Sunrise Dealers,West,Pune,active,good
+D002,Metro Equip,North,Delhi,active,watch
+D003,Apex Spares,West,Mumbai,active,good
+D004,Highland Motors,South,Bengaluru,active,good
+D005,Coastal Machinery,South,Chennai,active,good
+D006,Northstar Equipment,North,Chandigarh,active,good
+D007,Deccan Earthmovers,South,Hyderabad,active,watch
+D008,Ganges Tractors,East,Kolkata,active,good
+D009,Rajputana Machines,North,Jaipur,active,good
+D010,Konkan Equipment,West,Surat,active,good
+D011,Vidarbha Motors,West,Nagpur,active,good
+D012,Malabar Machinery,South,Kochi,active,good
+D013,Saffron Equip,North,Lucknow,active,watch
+D014,Eastern Earthmovers,East,Bhubaneswar,active,good
+D015,Capital Tractors,North,Noida,active,good
+D016,Sahyadri Spares,West,Nashik,active,good
+D017,Godavari Machines,South,Vijayawada,active,good
+D018,Frontier Equipment,North,Amritsar,suspended,hold
+D019,Peninsular Motors,South,Coimbatore,active,good
+D020,Aravalli Machinery,North,Udaipur,active,good
+D021,Brahmaputra Equip,East,Guwahati,active,good
+D022,Tapti Tractors,West,Vadodara,active,good

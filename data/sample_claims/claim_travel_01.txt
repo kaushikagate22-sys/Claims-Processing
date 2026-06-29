@@ -1,0 +1,10 @@
+TRAVEL CLAIM FORM
+=================
+Claimant Name: Vikram Nair
+Policy Number: TRVL-2025-11827
+Claim Type: travel
+Incident Date: 2025-04-10
+Claim Date: 2025-04-12
+Claim Amount: 60000
+Description: Trip cancellation due to pandemic travel restrictions imposed at destination. Requesting refund of pre-paid bookings.
+Notes: Policy active.

@@ -1,0 +1,11 @@
+WARRANTY CLAIM FORM
+Claimant Name: Vikram Shah
+Policy Number: WAR-2024-0001
+Claim Type: warranty
+Product Name: Samsung Refrigerator RT28
+Serial Number: SN-99213
+Purchase Date: 2024-03-01
+Warranty Period: 2 years
+Defect Description: compressor failure, not cooling
+Retailer: Croma
+Claim Amount: 32000

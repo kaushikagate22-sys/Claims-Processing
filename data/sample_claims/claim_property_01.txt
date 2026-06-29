@@ -1,0 +1,9 @@
+PROPERTY CLAIM FORM
+===================
+Claimant Name: Sunita Desai
+Claim Type: property
+Incident Date: 2025-02-20
+Claim Date: 2025-02-28
+Claim Amount: 320000
+Description: Fire damage to kitchen and living room caused by an electrical short circuit. Photographs attached.
+Notes: Surveyor report pending. Policy number not legible on submitted copy.

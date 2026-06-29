@@ -1,0 +1,9 @@
+[project]
+name = "agentic-claims-platform"
+version = "1.0.0"
+description = "Modular, agentic claims processing platform with reusable tools."
+requires-python = ">=3.9"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

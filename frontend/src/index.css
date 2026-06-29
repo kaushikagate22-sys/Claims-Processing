@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ground:    #0B0E13;
+  --color-panel:   #11161D;
+  --color-raised:  #161C25;
+  --color-line:    #232b36;
+  --color-line-2:  #2e3744;
+  --color-ink:     #EAF0F6;
+  --color-ink-dim: #9aa7b6;
+  --color-ink-mut: #6b7787;
+  --color-gold:    #D8B567;
+  --color-gold-2:  #F0D08A;
+  --color-approve: #46C08A;
+  --color-hold:    #E2A63E;
+  --color-escalate:#5E8DF0;
+  --color-reject:  #E76A60;
+
+  --font-display: "Fraunces", Georgia, serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --radius: 0.75rem;
+}
+
+@layer base {
+  @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;450;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap");
+  html { color-scheme: dark; font-size: 30px; }
+  body {
+    margin: 0;
+    background: var(--color-ground);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    -webkit-font-smoothing: antialiased;
+  }
+  * { border-color: var(--color-line); }
+}

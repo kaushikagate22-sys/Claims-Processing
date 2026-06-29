@@ -1,0 +1,10 @@
+HEALTH CLAIM FORM
+=================
+Claimant Name: Anita Sharma
+Policy Number: HLTH-2023-40192
+Claim Type: health
+Incident Date: 2025-05-02
+Claim Date: 2025-05-15
+Claim Amount: 1250000
+Description: Hospitalisation and cardiac surgery following a heart attack. Discharge summary and itemised hospital bills enclosed.
+Notes: Policy active for 3 years.

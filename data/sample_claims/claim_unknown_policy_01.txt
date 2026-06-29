@@ -1,0 +1,10 @@
+CLAIM SUBMISSION FORM
+=====================
+Claimant Name: Karan Malhotra
+Policy Number: AUTO-9999-00000
+Claim Type: auto
+Incident Date: 2025-03-01
+Claim Date: 2025-03-05
+Claim Amount: 75000
+Description: Accidental collision damage to insured car.
+Notes: Policy active.

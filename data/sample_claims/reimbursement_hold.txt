@@ -1,0 +1,11 @@
+EMPLOYEE REIMBURSEMENT CLAIM
+Claimant Name: R. Iyer
+Claim Reference: ER-2025-0042
+Claim Type: employee_reimbursement
+Employee ID: EMP-2291
+Expense Type: fuel and toll
+Visit Purpose: customer breakdown support
+Travel Dates: 2025-05-02 to 2025-05-03
+Distance Km: 240
+Claim Amount: 6400
+Description: field visit fuel and toll claim.

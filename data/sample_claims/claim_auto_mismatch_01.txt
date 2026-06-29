@@ -1,0 +1,10 @@
+CLAIM SUBMISSION FORM
+=====================
+Claimant Name: Imposter Singh
+Policy Number: AUTO-2024-88231
+Claim Type: auto
+Incident Date: 2025-02-01
+Claim Date: 2025-02-05
+Claim Amount: 60000
+Description: Accidental collision damage to insured car at a parking lot.
+Notes: Policy active.

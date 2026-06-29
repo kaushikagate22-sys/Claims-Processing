@@ -1,0 +1,10 @@
+PARTS REPLACEMENT CLAIM
+Claimant Name: Apex Spares
+Claim Reference: PR-2025-0019
+Claim Type: parts_replacement
+Part Number: SP-4471
+Purchase Invoice: INV-PART-9981
+Failure Description: alternator failed within warranty
+Machine Serial Number: MX-22019
+Claim Amount: 8800
+Description: replacement of defective alternator.

@@ -1,0 +1,76 @@
+flowchart TB
+    subgraph PRES["Presentation"]
+        UI["React Frontend<br/>upload · dashboard · detail<br/>(Stage 3-4)"]
+    end
+
+    subgraph API["Interface / API"]
+        FAPI["FastAPI<br/>POST /claims · GET /claims · GET /claims/:id<br/>(Stage 2)"]
+    end
+
+    subgraph SVC["Service"]
+        CS["ClaimsService<br/>run pipeline + persist"]
+    end
+
+    subgraph DOMAIN["Domain (claims-specific ~40%)"]
+        direction LR
+        A1["Intake"] --> A2["Extraction"] --> A3["Policy"] --> A4["Validation"] --> A5["Adjudication"]
+        PC["policy_compiler<br/>doc → rules.yaml"]
+    end
+
+    subgraph CORE["Core (reusable ~60%)"]
+        direction LR
+        T1["document_loader"]
+        T2["extractor"]
+        T3["retriever (RAG)"]
+        T4["record_store"]
+        T5["rules_engine"]
+        T6["llm_client"]
+        REG["ToolRegistry · Orchestrator · Context"]
+    end
+
+    subgraph DATA["Knowledge / Config"]
+        MP["master_policy.md<br/>(5 claim types)"]
+        RY["rules.yaml"]
+        CSV["policies.csv +<br/>claims_history.csv"]
+    end
+
+    subgraph PERSIST["Persistence"]
+        PG[("Postgres / SQLite<br/>claims · policies · history")]
+    end
+
+    subgraph EXT["External"]
+        LLM["OpenAI / Anthropic<br/>(offline fallback)"]
+    end
+
+    subgraph PLANNED["Planned (Azure parity)"]
+        direction LR
+        RED["Redis"]
+        WRK["Worker"]
+        BEAT["Beat"]
+        BLOB["Blob Storage"]
+    end
+
+    UI -->|HTTP/JSON| FAPI --> CS --> A1
+    A5 --> CS --> PG
+    A1 -.-> T1
+    A2 -.-> T2
+    A3 -.-> T3
+    A4 -.-> T4
+    A5 -.-> T5
+    T2 -.-> T6
+    T6 --> LLM
+    A3 --> MP
+    A5 --> RY
+    A4 --> CSV
+    PC --> MP
+    PC --> RY
+    CS -.future.-> RED -.-> WRK
+    RED -.-> BEAT
+    FAPI -.future.-> BLOB
+
+    classDef done fill:#d6f5d6,stroke:#2e7d32,color:#000;
+    classDef wip fill:#fff3cd,stroke:#b8860b,color:#000;
+    classDef todo fill:#eee,stroke:#999,color:#555,stroke-dasharray:4 3;
+    class CS,A1,A2,A3,A4,A5,PC,T1,T2,T3,T4,T5,T6,REG,MP,RY,CSV,PG,LLM done;
+    class FAPI wip;
+    class UI,RED,WRK,BEAT,BLOB todo;

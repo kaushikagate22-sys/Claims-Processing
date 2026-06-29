@@ -1,0 +1,34 @@
+part_number,part_name,category,unit_price,warranty_eligible
+SP-4471,Fuel injector assembly,fuel,8800,yes
+SP-1002,Hydraulic pump,hydraulic,42000,yes
+SP-1003,Engine block,engine,78000,no
+SP-9627,Valve 65,electrical,12000,yes
+SP-1458,Pump 37,transmission,5400,yes
+SP-6341,Pump 79,seal,12000,yes
+SP-1997,Filter 68,seal,12000,no
+SP-3142,Coupling 29,hydraulic,12000,yes
+SP-4000,Bracket 10,fuel,900,yes
+SP-8757,Bracket 25,hydraulic,1500,no
+SP-9492,Coupling 81,bearing,12000,yes
+SP-1930,Sensor 34,transmission,450,yes
+SP-9318,Hose 81,hydraulic,12000,yes
+SP-8262,Filter 88,electrical,8800,yes
+SP-8411,Coupling 78,bearing,5400,yes
+SP-9572,Pump 81,electrical,12000,yes
+SP-3246,Bearing 25,seal,3200,yes
+SP-2188,Sensor 64,engine,900,no
+SP-5960,Gasket 29,filter,900,yes
+SP-3248,Hose 38,engine,3200,yes
+SP-3667,Sensor 30,seal,5400,yes
+SP-6556,Bearing 35,filter,1500,yes
+SP-6995,Seal 53,bearing,3200,no
+SP-1296,Bearing 52,transmission,5400,yes
+SP-2848,Sensor 23,engine,1500,yes
+SP-1648,Valve 44,fuel,12000,yes
+SP-5237,Bearing 29,bearing,8800,yes
+SP-2465,Pump 17,fuel,3200,yes
+SP-5406,Seal 91,engine,12000,yes
+SP-2372,Bracket 38,engine,1500,yes
+SP-8434,Seal 53,seal,1500,no
+SP-3117,Seal 77,electrical,450,yes
+SP-5290,Seal 33,electrical,1500,no

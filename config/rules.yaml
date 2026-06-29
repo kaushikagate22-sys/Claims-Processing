@@ -1,0 +1,143 @@
+# =============================================================
+# config/rules.yaml — OEM / dealer claims rulebook (5 types)
+# Each type has its OWN named checklist (`checks`). Severity drives outcome:
+#   reject -> Reject | hold -> Hold | escalate -> Escalate | (all pass) -> Approve
+# Rules requiring master data (machine/part/employee masters, photos) are
+# intentionally omitted until that data exists. `required_fields`,
+# `exclusion_keywords`, etc. feed the derived facts the checks reference.
+# =============================================================
+claim_types:
+  warranty:
+    label: Warranty Claim
+    required_fields: [machine_serial_number, failure_code, job_card_number, failed_part, claim_amount]
+    exclusion_keywords: [misuse, accident, "external damage", "wear and tear", expired, "out of warranty", "not covered", unauthorized]
+    escalate_keywords: [repeat, "repeat failure", safety, "late claim", ambiguous, "high value"]
+    duplicate_key: job_card_number
+    high_value_threshold: 100000
+    settlement_cap: 500000
+    visual_checks:
+      - "The photo shows the failed part named in the claim (the described component)."
+      - "That part shows visible damage or failure consistent with the described failure."
+      - "The image is genuine equipment, not a receipt, document or unrelated object."
+    checks:
+      - {id: photo_consistent,       field: photo_consistent,      op: truthy,           severity: escalate, category: record,        message: "Submitted photos do not support the claim description — review."}
+      - {id: dealer_in_master,       field: dealer_known,          op: truthy,           severity: escalate, category: record,        message: "Dealer not found in the dealer master — review."}
+      - {id: serial_in_master,       field: serial_known,          op: truthy,           severity: escalate, category: record,        message: "Machine serial not found in the machine master — review."}
+      - {id: warranty_active_check,  field: warranty_active,       op: truthy,           severity: escalate, category: record,        message: "Machine warranty appears expired/inactive — review."}
+      - {id: amount_positive,        field: claim_amount,          op: gt,     value: 0, severity: reject,   category: eligibility,   message: "Claim amount must be a positive number."}
+      - {id: not_excluded,           field: excluded,              op: falsy,            severity: reject,   category: eligibility,   message: "Cause is excluded (misuse, accident, expired, non-covered)."}
+      - {id: not_duplicate,          field: is_duplicate,          op: falsy,            severity: reject,   category: eligibility,   message: "Duplicate of an existing claim (same job card)."}
+      - {id: machine_serial_present, field: machine_serial_number, op: exists,           severity: hold,     category: completeness,  message: "Machine serial number is missing."}
+      - {id: failure_code_present,   field: failure_code,          op: exists,           severity: hold,     category: completeness,  message: "Technician failure code is missing."}
+      - {id: job_card_present,       field: job_card_number,       op: exists,           severity: hold,     category: completeness,  message: "Job card number is missing."}
+      - {id: failed_part_present,    field: failed_part,           op: exists,           severity: hold,     category: completeness,  message: "Failed part detail is missing."}
+      - {id: within_value_authority, field: high_value,            op: falsy,            severity: escalate, category: review,        message: "High-value claim — needs human approval."}
+      - {id: no_escalation_trigger,  field: needs_escalation,      op: falsy,            severity: escalate, category: review,        message: "Escalation trigger present (repeat/safety/late)."}
+  nepi:
+    label: New Equipment Pre-Inspection
+    required_fields: [machine_serial_number, inspection_date, issue_type, claim_amount]
+    exclusion_keywords: ["after handover", "after use", "already accepted", "yard handling", "post-handover"]
+    escalate_keywords: ["structural damage", safety, "repeated missing", "high value", "delivery risk"]
+    duplicate_key: machine_serial_number
+    high_value_threshold: 100000
+    settlement_cap: null
+    visual_checks:
+      - "The photo shows the equipment unit being inspected."
+      - "The photo shows the pre-delivery issue described (cosmetic mark, missing item, etc.)."
+      - "The condition shown fits a pre-delivery inspection, not in-use or post-handover damage."
+    checks:
+      - {id: photo_consistent,       field: photo_consistent,      op: truthy,           severity: escalate, category: record,        message: "Submitted photos do not support the claim description — review."}
+      - {id: dealer_in_master,       field: dealer_known,          op: truthy,           severity: escalate, category: record,        message: "Dealer not found in the dealer master — review."}
+      - {id: serial_in_master,       field: serial_known,          op: truthy,           severity: escalate, category: record,        message: "Machine serial not found in the machine master — review."}
+      - {id: amount_positive,            field: claim_amount,          op: gt,    value: 0, severity: reject,   category: eligibility,  message: "Claim amount must be a positive number."}
+      - {id: not_excluded,               field: excluded,              op: falsy,           severity: reject,   category: eligibility,  message: "Issue reported after handover/use — not a pre-inspection claim."}
+      - {id: inspection_before_handover, field: handover_open,         op: truthy,          severity: reject,   category: eligibility,  message: "Customer already accepted — not a pre-handover issue."}
+      - {id: not_duplicate,              field: is_duplicate,          op: falsy,           severity: reject,   category: eligibility,  message: "Duplicate pre-inspection claim for this machine."}
+      - {id: machine_serial_present,     field: machine_serial_number, op: exists,          severity: hold,     category: completeness, message: "Machine serial number is missing."}
+      - {id: inspection_date_present,    field: inspection_date,       op: exists,          severity: hold,     category: completeness, message: "Inspection date is missing."}
+      - {id: issue_type_present,         field: issue_type,            op: exists,          severity: hold,     category: completeness, message: "Issue type is missing."}
+      - {id: dispatch_before_inspection, field: dispatch_before_inspection, op: truthy,     severity: hold,     category: completeness, message: "Dispatch date should precede the inspection date."}
+      - {id: within_value_authority,     field: high_value,            op: falsy,           severity: escalate, category: review,       message: "High-value rectification — needs approval."}
+      - {id: no_escalation_trigger,      field: needs_escalation,      op: falsy,           severity: escalate, category: review,       message: "Escalation trigger present (structural/safety)."}
+  parts_replacement:
+    label: Parts Replacement Claim
+    required_fields: [part_number, purchase_invoice, failure_description, claim_amount]
+    exclusion_keywords: [expired, "non-genuine", "wrong application", "fitment error", contamination]
+    escalate_keywords: ["repeat failure", "batch issue", "safety-critical", "supplier defect", "high cost"]
+    duplicate_key: purchase_invoice
+    high_value_threshold: 50000
+    settlement_cap: null
+    visual_checks:
+      - "The photo shows the replacement part referenced in the claim."
+      - "The part shows the failure or defect described."
+      - "The image is an actual part, not a receipt or unrelated object."
+    checks:
+      - {id: photo_consistent,       field: photo_consistent,      op: truthy,           severity: escalate, category: record,        message: "Submitted photos do not support the claim description — review."}
+      - {id: dealer_in_master,       field: dealer_known,          op: truthy,           severity: escalate, category: record,        message: "Dealer not found in the dealer master — review."}
+      - {id: part_in_master,         field: part_known,            op: truthy,           severity: escalate, category: record,        message: "Part number not found in the parts master — review."}
+      - {id: amount_positive,        field: claim_amount,        op: gt,    value: 0, severity: reject,   category: eligibility,  message: "Claim amount must be a positive number."}
+      - {id: not_excluded,           field: excluded,            op: falsy,           severity: reject,   category: eligibility,  message: "Excluded (non-genuine, wrong application, fitment error, expired)."}
+      - {id: not_duplicate,          field: is_duplicate,        op: falsy,           severity: reject,   category: eligibility,  message: "Duplicate claim for this purchase invoice."}
+      - {id: part_number_present,    field: part_number,         op: exists,          severity: hold,     category: completeness, message: "Part number is missing."}
+      - {id: invoice_present,        field: purchase_invoice,    op: exists,          severity: hold,     category: completeness, message: "Purchase invoice is missing."}
+      - {id: failure_desc_present,   field: failure_description, op: exists,          severity: hold,     category: completeness, message: "Failure description is missing."}
+      - {id: rma_present,            field: rma_number,          op: exists,          severity: hold,     category: completeness, message: "Return/RMA reference is missing."}
+      - {id: within_value_authority, field: high_value,          op: falsy,           severity: escalate, category: review,       message: "High-cost part — needs approval."}
+      - {id: no_escalation_trigger,  field: needs_escalation,    op: falsy,           severity: escalate, category: review,       message: "Escalation trigger present (batch/safety/supplier)."}
+  transit_damage:
+    label: Transit Damage Claim
+    required_fields: [consignment_note, machine_serial_number, damage_type, claim_amount]
+    exclusion_keywords: ["after receipt", "no transit evidence", "yard damage", mishandling, storage]
+    escalate_keywords: ["major structural", "customer rejection", "safety risk", "disputed liability", "high value", frame]
+    duplicate_key: consignment_note
+    high_value_threshold: 200000
+    settlement_cap: null
+    visual_checks:
+      - "The photo shows the equipment that was shipped."
+      - "The photo shows transit damage of the type described (dent, scratch, crack, etc.)."
+      - "The damaged area matches the damage location stated in the claim."
+    checks:
+      - {id: photo_consistent,       field: photo_consistent,      op: truthy,           severity: escalate, category: record,        message: "Submitted photos do not support the claim description — review."}
+      - {id: dealer_in_master,       field: dealer_known,          op: truthy,           severity: escalate, category: record,        message: "Dealer not found in the dealer master — review."}
+      - {id: consignment_in_master,  field: consignment_known,     op: truthy,           severity: escalate, category: record,        message: "Consignment/LR not found in the transit master — review."}
+      - {id: amount_positive,         field: claim_amount,          op: gt,    value: 0, severity: reject,   category: eligibility,  message: "Claim amount must be a positive number."}
+      - {id: not_excluded,            field: excluded,              op: falsy,           severity: reject,   category: eligibility,  message: "Excluded (damage after receipt, yard handling, no transit evidence)."}
+      - {id: not_duplicate,           field: is_duplicate,          op: falsy,           severity: reject,   category: eligibility,  message: "Duplicate claim for this consignment."}
+      - {id: consignment_present,     field: consignment_note,      op: exists,          severity: hold,     category: completeness, message: "LR/consignment note is missing."}
+      - {id: machine_serial_present,  field: machine_serial_number, op: exists,          severity: hold,     category: completeness, message: "Machine/part serial number is missing."}
+      - {id: damage_type_present,     field: damage_type,           op: exists,          severity: hold,     category: completeness, message: "Damage type is missing."}
+      - {id: receipt_remarks_present, field: receipt_remarks,       op: exists,          severity: hold,     category: completeness, message: "Receipt/unloading remarks are missing."}
+      - {id: within_value_authority,  field: high_value,            op: falsy,           severity: escalate, category: review,       message: "High-value damage — needs approval."}
+      - {id: no_escalation_trigger,   field: needs_escalation,      op: falsy,           severity: escalate, category: review,       message: "Escalation trigger present (structural/safety/disputed)."}
+  employee_reimbursement:
+    label: Employee Reimbursement Claim
+    required_fields: [employee_id, manager_approval, expense_type, claim_amount]
+    exclusion_keywords: [personal, alcohol, "non-business", fine, family]
+    escalate_keywords: ["policy exception", "high value", "repeated late", "suspected duplicate"]
+    duplicate_key: receipts
+    high_value_threshold: 25000
+    settlement_cap: null
+    visual_checks:
+      - "The image is a valid expense receipt or invoice."
+      - "The receipt is for the expense type claimed (fuel, toll, lodging, etc.)."
+      - "The receipt total is consistent with the claimed amount."
+    checks:
+      - {id: photo_consistent,       field: photo_consistent,      op: truthy,           severity: escalate, category: record,        message: "Submitted photos do not support the claim description — review."}
+      - {id: employee_in_master,     field: employee_known,        op: truthy,           severity: escalate, category: record,        message: "Employee not found in the employee master — review."}
+      - {id: employee_is_active,     field: employee_active,       op: truthy,           severity: escalate, category: record,        message: "Employee is not active — review."}
+      - {id: within_reimb_limit,     field: within_reimb_limit,    op: truthy,           severity: escalate, category: record,        message: "Amount exceeds the employee reimbursement limit — review."}
+      - {id: amount_positive,        field: claim_amount,    op: gt,    value: 0, severity: reject,   category: eligibility,  message: "Claim amount must be a positive number."}
+      - {id: not_excluded,           field: excluded,        op: falsy,           severity: reject,   category: eligibility,  message: "Excluded (personal, alcohol, non-business, fine)."}
+      - {id: not_duplicate,          field: is_duplicate,    op: falsy,           severity: reject,   category: eligibility,  message: "Duplicate bill/receipt already reimbursed."}
+      - {id: employee_id_present,    field: employee_id,     op: exists,          severity: hold,     category: completeness, message: "Employee ID is missing."}
+      - {id: expense_type_present,   field: expense_type,    op: exists,          severity: hold,     category: completeness, message: "Expense type is missing."}
+      - {id: manager_approval_ok,    field: manager_approval_ok, op: truthy,      severity: hold,     category: completeness, message: "Manager approval is missing or not granted."}
+      - {id: within_value_authority, field: high_value,      op: falsy,           severity: escalate, category: review,       message: "High-value claim — needs finance/HR approval."}
+      - {id: no_escalation_trigger,  field: needs_escalation, op: falsy,          severity: escalate, category: review,       message: "Escalation trigger present (policy exception/repeat late)."}
+
+# Fallback checks for any unconfigured type (kept minimal).
+rules:
+- {id: amount_positive,  field: claim_amount, op: gt, value: 0, severity: reject, category: eligibility,  message: "Claim amount must be a positive number."}
+- {id: not_excluded,     field: excluded,     op: falsy,        severity: reject, category: eligibility,  message: "Claim falls under a policy exclusion."}
+- {id: not_duplicate,    field: is_duplicate, op: falsy,        severity: reject, category: eligibility,  message: "Possible duplicate claim."}
+- {id: documents_complete, field: complete,   op: truthy,       severity: hold,   category: completeness, message: "Mandatory documents/fields are missing."}

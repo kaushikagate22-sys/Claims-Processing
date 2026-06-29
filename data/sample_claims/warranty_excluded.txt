@@ -1,0 +1,10 @@
+WARRANTY CLAIM FORM
+Claimant Name: Metro Equip
+Claim Reference: WC-2025-0008
+Claim Type: warranty
+Machine Serial Number: MX-77410
+Failure Code: ENG-110
+Failed Part: engine block
+Job Card Number: JC-2025-3002
+Claim Amount: 90000
+Description: engine damage due to operator misuse and accident on site.

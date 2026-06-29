@@ -1,0 +1,16 @@
+WARRANTY CLAIM FORM
+Claimant Name: Sunrise Dealers
+Claim Reference: WC-2025-0007
+Claim Type: warranty
+Machine Serial Number: MX-88231
+Model: Excavator EX200
+Hour Meter: 1320
+Failure Date: 2025-04-10
+Failure Code: HYD-204
+Failed Part: hydraulic pump
+Part Serial Number: HP-55120
+Job Card Number: JC-2025-3001
+Labour Hours: 4
+Dealer Name: Sunrise Dealers
+Claim Amount: 48000
+Description: hydraulic pump failure under warranty, replaced and tested.

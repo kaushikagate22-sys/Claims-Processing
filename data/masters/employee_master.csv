@@ -1,0 +1,20 @@
+employee_id,name,department,manager_id,manager_name,status,reimbursement_limit
+EMP-2291,R. Iyer,Field Service,EMP-1001,S. Rao,active,15000
+EMP-2300,A. Sharma,Spares,EMP-1003,M. Pillai,active,15000
+EMP-2301,B. Nair,Spares,EMP-1004,V. Joshi,active,15000
+EMP-2302,C. Das,Field Service,EMP-1003,M. Pillai,active,8000
+EMP-2303,D. Reddy,Field Service,EMP-1001,S. Rao,active,25000
+EMP-2304,E. Gupta,Sales,EMP-1004,V. Joshi,inactive,8000
+EMP-2305,F. Bose,Admin,EMP-1004,V. Joshi,inactive,25000
+EMP-2306,G. Menon,Spares,EMP-1004,V. Joshi,active,10000
+EMP-2307,H. Singh,Logistics,EMP-1002,A. Khan,active,10000
+EMP-2308,I. Patel,Logistics,EMP-1004,V. Joshi,active,10000
+EMP-2309,J. Roy,Field Service,EMP-1001,S. Rao,active,20000
+EMP-2310,K. Verma,Field Service,EMP-1002,A. Khan,active,20000
+EMP-2311,L. Shah,Spares,EMP-1003,M. Pillai,active,15000
+EMP-2312,N. Kaur,Workshop,EMP-1001,S. Rao,active,10000
+EMP-2313,O. Mehta,Workshop,EMP-1003,M. Pillai,active,15000
+EMP-2314,P. Naidu,Logistics,EMP-1003,M. Pillai,active,10000
+EMP-2315,Q. Banerjee,Logistics,EMP-1001,S. Rao,active,15000
+EMP-2316,R. Chauhan,Field Service,EMP-1002,A. Khan,active,20000
+EMP-2317,T. Pawar,Workshop,EMP-1001,S. Rao,active,25000

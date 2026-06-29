@@ -1,0 +1,10 @@
+CLAIM SUBMISSION FORM
+=====================
+Claimant Name: Rohan Mehta
+Policy Number: AUTO-2024-88231
+Claim Type: auto
+Incident Date: 2025-03-12
+Claim Date: 2025-03-20
+Claim Amount: 145000
+Description: Front-end collision damage to insured car after another vehicle ran a red light. Repair estimate attached.
+Notes: Policy active, premium paid. FIR not required (no theft).

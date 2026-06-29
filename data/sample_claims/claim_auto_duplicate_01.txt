@@ -1,0 +1,10 @@
+CLAIM SUBMISSION FORM
+=====================
+Claimant Name: Rohan Mehta
+Policy Number: AUTO-2024-88231
+Claim Type: auto
+Incident Date: 2024-09-15
+Claim Date: 2025-04-01
+Claim Amount: 90000
+Description: Accidental damage to insured car. Requesting reimbursement for repairs.
+Notes: Policy active.

@@ -1,0 +1,25 @@
+# --- core (required) ---
+pydantic>=2.5
+PyYAML>=6.0
+
+# --- API layer ---
+fastapi>=0.110
+uvicorn[standard]>=0.27
+python-multipart>=0.0.9
+
+# --- persistence ---
+SQLAlchemy>=2.0
+# Postgres driver (not needed for local SQLite; required for Azure Postgres)
+psycopg2-binary>=2.9
+
+# --- optional: real LLM extraction (offline fallback works without either) ---
+# set ONE of these keys in .env; the client auto-detects the provider
+openai>=1.30
+anthropic>=0.39
+
+# --- optional: document formats (offline txt/md work without these) ---
+pypdf>=4.0
+python-docx>=1.1
+
+# --- dev / test ---
+pytest>=8.0
