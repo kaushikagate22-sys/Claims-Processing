@@ -94,11 +94,13 @@ class AdminService:
         return {
             "employee": s.employee_master, "dealer": s.dealer_master,
             "machine": s.machine_master, "parts": s.parts_master, "transit": s.transit_master,
+            "nepi_policy": s.nepi_rates,
         }
 
     MASTER_LABELS = {
         "employee": "Employee master", "dealer": "Dealer / retail master",
         "machine": "Machine / serial master", "parts": "Parts master", "transit": "Transit / consignment master",
+        "nepi_policy": "NEPI reimbursement policy (rate card)",
     }
 
     def get_masters(self) -> Dict[str, Any]:

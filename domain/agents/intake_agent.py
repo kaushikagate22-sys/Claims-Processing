@@ -43,7 +43,8 @@ class IntakeAgent(BaseAgent):
             context.set("source_meta", {k: v for k, v in res.data.items() if k != "text"})
 
         context.set("claim_text", text)
-        guess = self._classify(text)
+        forced = context.get("forced_type")
+        guess = forced if forced else self._classify(text)
         context.set("claim_type_guess", guess)
         return f"loaded {len(text)} chars; type guess = {guess}"
 

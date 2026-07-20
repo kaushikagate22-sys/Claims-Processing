@@ -48,11 +48,26 @@ function Recent() {
 export default function Upload() {
   const [text, setText] = useState("");
   const [file, setFile] = useState(null);
+  const [financial, setFinancial] = useState(null);
+  const [supporting, setSupporting] = useState(null);
+  const [ctype, setCtype] = useState("");
   const [photos, setPhotos] = useState([]);
   const [dragOver, setDragOver] = useState(false);
   const [run, setRun] = useState(null);
   const inputRef = useRef(null);
+  const finRef = useRef(null);
+  const supRef = useRef(null);
   const photoRef = useRef(null);
+
+  const isNepiReimb = ctype === "nepi_reimbursement";
+  const isWarranty = ctype === "warranty";
+  const needsFinancial = isNepiReimb || isWarranty;
+  const needsSupporting = isWarranty;
+  const needsEvidence = isWarranty;
+  const canRun = isWarranty
+    ? (file && supporting && financial && photos.length > 0)
+    : isNepiReimb ? (file && financial) : !!file;
+  const primaryLabel = isWarranty ? "Claim form" : isNepiReimb ? "Field Service Report (FSR)" : null;
 
   if (run) return <PipelineConsole start={run.start} onReset={() => setRun(null)} />;
 
@@ -60,9 +75,25 @@ export default function Upload() {
     <div className="grid grid-cols-[1.3fr_1fr] gap-6 max-[1000px]:grid-cols-1">
       <div className="space-y-6">
         <Card>
-          <CardHeader><CardTitle>Upload a claim file</CardTitle></CardHeader>
+          <CardHeader><CardTitle>{isWarranty ? "Warranty claim — documents" : isNepiReimb ? "NEPI reimbursement — documents" : "Upload a claim file"}</CardTitle></CardHeader>
           <CardBody>
-            <p className="mt-0 mb-3 text-sm text-ink-dim">Accepts .txt, .md, .pdf or .docx — the engine reads any layout.</p>
+            <label className="mb-1 block text-sm font-medium text-ink-dim">Claim type</label>
+            <select value={ctype} onChange={(e) => setCtype(e.target.value)}
+              className="mb-4 w-full rounded-xl border border-line-2 bg-ground/40 px-3 py-2.5 text-base text-ink outline-none focus:border-gold/50">
+              <option value="">Auto-detect from document</option>
+              <option value="nepi_reimbursement">NEPI Service Reimbursement (FSR + invoice)</option>
+              <option value="warranty">Warranty (claim form + FSR + evidence + invoice)</option>
+              <option value="nepi">NEPI (pre-inspection)</option>
+              <option value="parts_replacement">Parts replacement</option>
+              <option value="transit_damage">Transit damage</option>
+              <option value="employee_reimbursement">Employee reimbursement</option>
+            </select>
+            <p className="mt-0 mb-3 text-sm text-ink-dim">{isWarranty
+              ? "Warranty requires four items: the claim form (primary), the FSR, a failure-evidence photo, and the invoice. All are cross-checked — serial, part and amount must agree."
+              : isNepiReimb
+              ? "This claim type requires two documents: the FSR (primary) and the invoice (financial). Both are validated against the NEPI policy in Admin."
+              : "Accepts .txt, .md, .pdf or .docx — the engine reads any layout."}</p>
+            {primaryLabel && <div className="mb-1 text-sm font-medium text-ink">Primary: {primaryLabel} <span className="text-reject">*</span></div>}
             <div
               onClick={() => inputRef.current?.click()}
               onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
@@ -74,13 +105,45 @@ export default function Upload() {
               {file ? (
                 <><FileText className="h-7 w-7 text-approve" /><strong className="text-base">{file.name}</strong><span className="font-mono text-xs text-ink-mut">{(file.size / 1024).toFixed(1)} KB</span></>
               ) : (
-                <><UploadCloud className="h-7 w-7 text-ink-mut" /><span className="text-base text-ink-dim">Drop a file here, or click to browse</span></>
+                <><UploadCloud className="h-7 w-7 text-ink-mut" /><span className="text-base text-ink-dim">{primaryLabel ? `Drop the ${primaryLabel.toLowerCase()} here, or click to browse` : "Drop a file here, or click to browse"}</span></>
               )}
             </div>
+            {needsSupporting && (
+              <div className="mt-3">
+                <div className="mb-1 text-sm font-medium text-ink">Supporting: Field Service Report (FSR) <span className="text-reject">*</span></div>
+                <div
+                  onClick={() => supRef.current?.click()}
+                  className={"flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-6 py-8 text-center transition " +
+                    (supporting ? "border-approve/40 bg-approve/5" : "border-line-2 hover:border-gold/40 hover:bg-line/20")}>
+                  <input ref={supRef} type="file" accept=".txt,.md,.pdf,.docx" hidden onChange={(e) => setSupporting(e.target.files?.[0] || null)} />
+                  {supporting ? (
+                    <><FileText className="h-6 w-6 text-approve" /><strong className="text-base">{supporting.name}</strong><span className="font-mono text-xs text-ink-mut">{(supporting.size / 1024).toFixed(1)} KB</span></>
+                  ) : (
+                    <><UploadCloud className="h-6 w-6 text-ink-mut" /><span className="text-base text-ink-dim">Drop the FSR here, or click to browse</span></>
+                  )}
+                </div>
+              </div>
+            )}
+            {needsFinancial && (
+              <div className="mt-3">
+                <div className="mb-1 text-sm font-medium text-ink">Financial: Invoice <span className="text-reject">*</span></div>
+                <div
+                  onClick={() => finRef.current?.click()}
+                  className={"flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-6 py-8 text-center transition " +
+                    (financial ? "border-approve/40 bg-approve/5" : "border-line-2 hover:border-gold/40 hover:bg-line/20")}>
+                  <input ref={finRef} type="file" accept=".txt,.md,.pdf,.docx" hidden onChange={(e) => setFinancial(e.target.files?.[0] || null)} />
+                  {financial ? (
+                    <><FileText className="h-6 w-6 text-approve" /><strong className="text-base">{financial.name}</strong><span className="font-mono text-xs text-ink-mut">{(financial.size / 1024).toFixed(1)} KB</span></>
+                  ) : (
+                    <><UploadCloud className="h-6 w-6 text-ink-mut" /><span className="text-base text-ink-dim">Drop the invoice here, or click to browse</span></>
+                  )}
+                </div>
+              </div>
+            )}
             <div className="mt-4 rounded-xl border border-line bg-ground/40 p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="flex items-center gap-2 text-base font-medium"><ImageIcon className="h-4 w-4 text-gold" />Photos (optional)</div>
+                  <div className="flex items-center gap-2 text-base font-medium"><ImageIcon className="h-4 w-4 text-gold" />{needsEvidence ? <>Evidence photo <span className="text-reject">*</span></> : "Photos (optional)"}</div>
                   <p className="mt-0.5 text-sm text-ink-dim">Attach claim photos — the engine checks them against the description.</p>
                 </div>
                 <Button variant="solid" size="sm" onClick={() => photoRef.current?.click()}>Add photos</Button>
@@ -98,7 +161,7 @@ export default function Upload() {
                 </div>
               )}
             </div>
-            <Button variant="gold" className="mt-4" disabled={!file} onClick={() => setRun({ start: () => api.streamFile(file, photos) })}>Run pipeline</Button>
+            <Button variant="gold" className="mt-4" disabled={!canRun} onClick={() => setRun({ start: () => api.streamFile(file, photos, needsFinancial ? financial : null, ctype || null, needsSupporting ? supporting : null) })}>Run pipeline</Button>
           </CardBody>
         </Card>
 

@@ -139,24 +139,24 @@ export default function Dashboard() {
           <CardHeader><CardTitle>By claim type</CardTitle><TrendingUp className="ml-auto h-4 w-4 text-ink-mut" /></CardHeader>
           <CardBody>
             {types.length === 0 ? <p className="text-ink-dim">No data yet.</p> : (
-              <div className="h-44">
-                <ResponsiveContainer>
-                  <BarChart data={types} layout="vertical" margin={{ left: 0, right: 12, top: 0, bottom: 0 }}>
-                    <XAxis type="number" hide />
-                    <Tooltip content={<TipBox />} cursor={{ fill: "#161C25" }} />
-                    <Bar dataKey="count" fill="#D8B567" radius={[0, 6, 6, 0]} barSize={18} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
+              <ul className="space-y-2.5">
+                {types.map((t) => {
+                  const max = types[0]?.count || 1;
+                  const pct = Math.max(3, Math.round((t.count / max) * 100));
+                  return (
+                    <li key={t.name}>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="truncate pr-2 capitalize text-ink-dim">{t.name.replace(/_/g, " ")}</span>
+                        <span className="font-semibold tabular-nums">{t.count}</span>
+                      </div>
+                      <div className="mt-1 h-2 w-full overflow-hidden rounded-full" style={{ background: "#161C25" }}>
+                        <div className="h-full rounded-full" style={{ width: `${pct}%`, background: "#D8B567" }} />
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
             )}
-            <ul className="mt-2 space-y-1.5">
-              {types.map((t) => (
-                <li key={t.name} className="flex items-center justify-between text-sm">
-                  <span className="capitalize text-ink-dim">{t.name.replace(/_/g, " ")}</span>
-                  <span className="font-semibold tabular-nums">{t.count}</span>
-                </li>
-              ))}
-            </ul>
           </CardBody>
         </Card>
       </div>

@@ -2,3 +2,5 @@ reference,claim_type,status,paid_amount
 JC-2023-1001,warranty,PAID,42000
 INV-PART-9981,parts_replacement,PAID,8800
 LR-2023-5567,transit_damage,PAID,150000
+INV-DUP-0001,nepi_reimbursement,paid,3500
+AF1ARG48VHS008321|nepi_1500,nepi_reimbursement,paid,4500

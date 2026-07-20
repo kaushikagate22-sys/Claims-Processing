@@ -51,6 +51,7 @@ class Settings:
         self.machine_master = MASTERS_DIR / "machine_master.csv"
         self.parts_master = MASTERS_DIR / "parts_master.csv"
         self.transit_master = MASTERS_DIR / "transit_master.csv"
+        self.nepi_rates = MASTERS_DIR / "nepi_rates.csv"
         self.llm_model = os.getenv("LLM_MODEL", "claude-sonnet-4-6")
         self.top_k = int(os.getenv("RETRIEVER_TOP_K", "4"))
         self.uploads_dir.mkdir(parents=True, exist_ok=True)

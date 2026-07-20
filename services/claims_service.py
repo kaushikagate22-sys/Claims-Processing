@@ -101,17 +101,29 @@ class ClaimsService:
         claim_text: Optional[str] = None,
         source_filename: Optional[str] = None,
         image_paths: Optional[List[str]] = None,
+        financial_path: Optional[str] = None,
+        supporting_path: Optional[str] = None,
+        claim_type: Optional[str] = None,
     ) -> Iterator[Dict[str, Any]]:
         """Run the pipeline agent-by-agent, yielding a real event per step."""
         ctx = Context()
-        if source_path:
-            ctx.set("source_path", source_path)
-        if claim_text:
-            ctx.set("claim_text", claim_text)
+        from core.tools.document_loader import extract_pdf_images
+        from domain.agents.claims_orchestrator import load_claim_documents
         images = list(image_paths or [])
-        if source_path:
-            from core.tools.document_loader import extract_pdf_images
-            images += extract_pdf_images(source_path)
+        if financial_path or supporting_path:
+            combined, docs, pdf_imgs = load_claim_documents(source_path, supporting_path, financial_path, claim_text)
+            ctx.set("claim_text", combined)
+            if len(docs) >= 2:
+                ctx.set("doc_texts", docs)
+            images += pdf_imgs
+        else:
+            if source_path:
+                ctx.set("source_path", source_path)
+                images += extract_pdf_images(source_path)
+            if claim_text:
+                ctx.set("claim_text", claim_text)
+        if claim_type:
+            ctx.set("forced_type", claim_type)
         if images:
             ctx.set("image_paths", images)
 

@@ -166,14 +166,39 @@ def stream_text(body: ClaimText) -> StreamingResponse:
     return _sse(_service.stream_process(claim_text=body.text))
 
 
+from fastapi import Form  # noqa: E402
+
+
 @app.post("/claims/stream/upload")
-async def stream_upload(file: UploadFile = File(...), images: List[UploadFile] = File(default=[])) -> StreamingResponse:
-    """Stream the live pipeline run for an uploaded file (+ optional photos)."""
+async def stream_upload(
+    file: UploadFile = File(...),
+    images: List[UploadFile] = File(default=[]),
+    financial: UploadFile | None = File(default=None),
+    supporting: UploadFile | None = File(default=None),
+    claim_type: str | None = Form(default=None),
+) -> StreamingResponse:
+    """Stream the live pipeline run for an uploaded primary file, an optional
+    supporting document (e.g. the FSR), an optional financial document (e.g. the
+    invoice), optional photos, and an optional forced claim type."""
     dest = _settings.uploads_dir / file.filename
     with dest.open("wb") as f:
         shutil.copyfileobj(file.file, f)
+
+    def _save_opt(up):
+        if up is not None and up.filename:
+            p = _settings.uploads_dir / up.filename
+            with p.open("wb") as fh:
+                shutil.copyfileobj(up.file, fh)
+            return str(p)
+        return None
+
+    financial_path = _save_opt(financial)
+    supporting_path = _save_opt(supporting)
     image_paths = _save_images(images)
-    return _sse(_service.stream_process(source_path=str(dest), source_filename=file.filename, image_paths=image_paths))
+    return _sse(_service.stream_process(
+        source_path=str(dest), source_filename=file.filename, image_paths=image_paths,
+        financial_path=financial_path, supporting_path=supporting_path,
+        claim_type=(claim_type or None)))
 
 
 # --- admin: policy + records ---------------------------------------------

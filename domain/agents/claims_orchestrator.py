@@ -13,6 +13,7 @@ the core, tools, registry and orchestrator are untouched.
 """
 from __future__ import annotations
 
+import os
 from typing import Optional
 
 from core.agents.orchestrator import Orchestrator
@@ -28,6 +29,40 @@ from domain.agents.visual_validation_agent import VisualValidationAgent
 from domain.agents.summarizer_agent import SummarizerAgent
 from domain.agents.notification_agent import NotificationAgent
 from domain.schemas.claim import ClaimDecisionReport
+
+
+def load_claim_documents(source_path=None, supporting_path=None, financial_path=None, claim_text=None):
+    """Load a claim's documents by role and return (combined_text, doc_texts, pdf_images).
+
+    doc_texts is a per-document list ``[{role, name, text}]`` used for cross-document
+    reconciliation; combined_text is the merged record used for the main extraction.
+    """
+    from core.tools.document_loader import DocumentLoaderTool, extract_pdf_images
+    loader = DocumentLoaderTool()
+    docs, images = [], []
+
+    def _load(path, role):
+        if not path:
+            return
+        r = loader.run(path=path)
+        docs.append({"role": role, "name": os.path.basename(path),
+                     "text": r.data["text"] if r.ok else ""})
+        images.extend(extract_pdf_images(path))
+
+    if claim_text and not source_path:
+        docs.append({"role": "primary", "name": "pasted", "text": claim_text})
+    _load(source_path, "primary")
+    _load(supporting_path, "supporting")
+    _load(financial_path, "financial")
+
+    markers = {"supporting": "--- SUPPORTING DOCUMENT (FSR) ---",
+               "financial": "--- FINANCIAL DOCUMENT (INVOICE) ---"}
+    parts = []
+    for d in docs:
+        m = markers.get(d["role"], "")
+        parts.append((m + "\n" if m else "") + d["text"])
+    combined = "\n\n".join(p for p in parts if p.strip())
+    return combined, docs, images
 
 
 class ClaimsPipeline:
@@ -60,16 +95,27 @@ class ClaimsPipeline:
         source_path: Optional[str] = None,
         claim_text: Optional[str] = None,
         image_paths: Optional[list] = None,
+        financial_path: Optional[str] = None,
+        supporting_path: Optional[str] = None,
+        claim_type: Optional[str] = None,
     ) -> ClaimDecisionReport:
         ctx = Context()
-        if source_path:
-            ctx.set("source_path", source_path)
-        if claim_text:
-            ctx.set("claim_text", claim_text)
+        from core.tools.document_loader import extract_pdf_images
         images = list(image_paths or [])
-        if source_path:
-            from core.tools.document_loader import extract_pdf_images
-            images += extract_pdf_images(source_path)
+        if financial_path or supporting_path:
+            combined, docs, pdf_imgs = load_claim_documents(source_path, supporting_path, financial_path, claim_text)
+            ctx.set("claim_text", combined)
+            if len(docs) >= 2:
+                ctx.set("doc_texts", docs)
+            images += pdf_imgs
+        else:
+            if source_path:
+                ctx.set("source_path", source_path)
+                images += extract_pdf_images(source_path)
+            if claim_text:
+                ctx.set("claim_text", claim_text)
+        if claim_type:
+            ctx.set("forced_type", claim_type)
         if images:
             ctx.set("image_paths", images)
         ctx = self.orchestrator.run(ctx)

@@ -1,0 +1,42 @@
+# Render blueprint for the FastAPI backend.
+# Deploy: push this repo to GitHub, then in Render → "New +" → "Blueprint" and
+# point it at the repo. Render reads this file and creates the service.
+#
+# The Vite frontend is deployed SEPARATELY on Vercel (see DEPLOY.md); it talks to
+# this service via the VITE_API_URL build var you set in Vercel.
+services:
+  - type: web
+    name: agentic-claims-api
+    runtime: python
+    plan: free
+    # Install deps, then create tables + seed the policy master / claims history.
+    buildCommand: "pip install -r requirements.txt && python scripts/seed_db.py"
+    startCommand: "uvicorn api.main:app --host 0.0.0.0 --port $PORT"
+    healthCheckPath: /health
+    envVars:
+      # Pin a Python with prebuilt wheels for psycopg2-binary / pydantic-core.
+      - key: PYTHON_VERSION
+        value: 3.12.11
+      # CORS: set this to your Vercel frontend origin, e.g.
+      #   https://your-app.vercel.app
+      # Comma-separate if you have several (custom domain + *.vercel.app).
+      - key: ALLOWED_ORIGINS
+        sync: false
+      # --- Optional: real LLM. Leave unset to run the deterministic offline mode.
+      #     Set ONE of these in the Render dashboard (Environment tab):
+      # - key: OPENAI_API_KEY
+      #     sync: false
+      # - key: ANTHROPIC_API_KEY
+      #     sync: false
+      # --- Optional: durable storage. Without this, SQLite lives on the free
+      #     tier's EPHEMERAL disk and RESETS to the seeded state on every deploy
+      #     and spin-down (see DEPLOY.md). For persistence, provision Postgres and
+      #     set its connection string here:
+      # - key: DATABASE_URL
+      #     sync: false
+
+# --- Optional: durable Postgres (uncomment this whole block AND the DATABASE_URL
+#     env var above, wiring fromDatabase, to make processed claims persist).
+# databases:
+#   - name: agentic-claims-db
+#     plan: free

@@ -129,10 +129,13 @@ export const api = {
     yield* readSSE(res);
   },
 
-  async *streamFile(file, images = []) {
+  async *streamFile(file, images = [], financial = null, claimType = null, supporting = null) {
     const form = new FormData();
     form.append("file", file);
     (images || []).forEach((img) => form.append("images", img));
+    if (financial) form.append("financial", financial);
+    if (supporting) form.append("supporting", supporting);
+    if (claimType) form.append("claim_type", claimType);
     const res = await fetch(`${BASE}/claims/stream/upload`, {
       method: "POST",
       body: form,

@@ -1,0 +1,7 @@
+rate_key,service_type,region,approved_rate,revised_days
+commissioning_installation|standard,commissioning_installation,standard,4500,1
+nepi_500|standard,nepi_500,standard,3500,0.5
+nepi_1500|standard,nepi_1500,standard,4500,1
+commissioning_installation|hilly_desert,commissioning_installation,hilly_desert,6000,1
+nepi_500|hilly_desert,nepi_500,hilly_desert,5000,0.5
+nepi_1500|hilly_desert,nepi_1500,hilly_desert,6000,1

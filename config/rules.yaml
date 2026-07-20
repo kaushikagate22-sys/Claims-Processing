@@ -33,6 +33,9 @@ claim_types:
       - {id: failed_part_present,    field: failed_part,           op: exists,           severity: hold,     category: completeness,  message: "Failed part detail is missing."}
       - {id: within_value_authority, field: high_value,            op: falsy,            severity: escalate, category: review,        message: "High-value claim — needs human approval."}
       - {id: no_escalation_trigger,  field: needs_escalation,      op: falsy,            severity: escalate, category: review,        message: "Escalation trigger present (repeat/safety/late)."}
+      - {id: docs_serial_match,      field: docs_serial_match,     op: truthy,           severity: escalate, category: integrity,     message: "Machine serial differs across the claim documents — review."}
+      - {id: docs_part_match,        field: docs_part_match,       op: truthy,           severity: escalate, category: integrity,     message: "Failed part differs between the claim form and FSR — review."}
+      - {id: docs_amount_match,      field: docs_amount_match,     op: truthy,           severity: escalate, category: integrity,     message: "Claim amount and invoice do not reconcile across documents — review."}
   nepi:
     label: New Equipment Pre-Inspection
     required_fields: [machine_serial_number, inspection_date, issue_type, claim_amount]
@@ -136,6 +139,33 @@ claim_types:
       - {id: no_escalation_trigger,  field: needs_escalation, op: falsy,          severity: escalate, category: review,       message: "Escalation trigger present (policy exception/repeat late)."}
 
 # Fallback checks for any unconfigured type (kept minimal).
+  nepi_reimbursement:
+    label: "NEPI Service Reimbursement"
+    required_fields: ["machine_serial_number", "service_type", "hmr_hours", "claim_amount", "invoice_number", "fsr_number"]
+    exclusion_keywords: []
+    escalate_keywords: ["dispute", "rate revision pending"]
+    duplicate_key: "invoice_number"
+    high_value_threshold: 50000
+    settlement_cap: null
+    visual_checks:
+      - "The hour-meter (HMR) photo shows a reading consistent with the service claimed."
+      - "The machine serial-number plate photo matches the claimed serial number."
+      - "The work-done photos show genuine service activity (replaced parts / materials)."
+    checks:
+      - {id: amount_positive,        field: claim_amount,       op: gt,     value: 0, severity: reject,   category: eligibility,   message: "Claim amount must be positive."}
+      - {id: fsr_present,            field: fsr_number,         op: exists,           severity: hold,     category: documents,     message: "FSR number missing — supporting Field Service Report required."}
+      - {id: invoice_present,        field: invoice_number,     op: exists,           severity: hold,     category: documents,     message: "Invoice number missing."}
+      - {id: invoice_not_duplicate,  field: is_duplicate,       op: falsy,            severity: reject,   category: integrity,     message: "Invoice already accounted (duplicate invoice number)."}
+      - {id: nepi_not_already_claimed, field: nepi_not_claimed, op: truthy,           severity: reject,   category: integrity,     message: "This NEPI service was already claimed for this machine serial (duplicate reimbursement)."}
+      - {id: approved_before_invoice, field: approval_ok,       op: truthy,           severity: hold,     category: workflow,      message: "Claim not approved (status pending/rejected) — only approved claims are processed."}
+      - {id: serial_in_master,       field: serial_known,       op: truthy,           severity: escalate, category: record,        message: "Machine serial not found in the machine master — review."}
+      - {id: sale_date_known,        field: sale_date_known,    op: truthy,           severity: escalate, category: record,        message: "Machine sale date not on record — verify dealer-to-customer sale."}
+      - {id: amount_matches_rate,    field: amount_matches_rate, op: truthy,          severity: escalate, category: rate,          message: "Claim base (pre-GST) amount does not match the approved NEPI rate — review."}
+      - {id: hmr_eligible,           field: hmr_eligible,       op: truthy,           severity: escalate, category: eligibility,   message: "Machine hours not in the eligible window for the service claimed — review."}
+      - {id: period_eligible,         field: period_eligible,    op: truthy,           severity: escalate, category: eligibility,   message: "Service not within the eligible period from the machine sale date — review."}
+      - {id: fsr_not_duplicate,       field: fsr_not_duplicate,  op: truthy,           severity: reject,   category: integrity,     message: "FSR / claim number already accounted (duplicate)."}
+      - {id: photo_consistent,       field: photo_consistent,   op: truthy,           severity: escalate, category: record,        message: "FSR photos do not support the claim — review."}
+
 rules:
 - {id: amount_positive,  field: claim_amount, op: gt, value: 0, severity: reject, category: eligibility,  message: "Claim amount must be a positive number."}
 - {id: not_excluded,     field: excluded,     op: falsy,        severity: reject, category: eligibility,  message: "Claim falls under a policy exclusion."}

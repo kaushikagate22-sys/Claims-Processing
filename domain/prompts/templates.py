@@ -72,6 +72,23 @@ TYPE_EXTRACTION_FIELDS = {
         "distance_km": "distance travelled in km (number or null)",
         "receipts": "receipt/bill reference numbers (string or null)",
     },
+    "nepi_reimbursement": {
+        "ic_ticket_number": "IC / incident ticket number (string or null)",
+        "fsr_number": "Field Service Report (FSR) number (string or null)",
+        "invoice_number": "dealer invoice number (string or null)",
+        "machine_serial_number": "machine serial number (string or null)",
+        "model": "machine model (string or null)",
+        "base_amount": "taxable / base value BEFORE GST (number or null)",
+        "tax_amount": "GST / IGST / CGST+SGST tax amount (number or null)",
+        "hmr_hours": "machine hour-meter reading / HMR in hours (number or null)",
+        "service_type": "one of: nepi_500 / nepi_1500 / commissioning_installation",
+        "dealer_code": "dealer code (string or null)",
+        "customer_name": "end customer name (string or null)",
+        "region": "standard / hilly_desert (string or null)",
+        "approval_status": "approved / pending — was the claim approved before invoicing?",
+        "service_date": "date the NEPI service was performed (FSR date), ISO yyyy-mm-dd if possible",
+        "sale_date": "machine sale date dealer-to-customer, ISO yyyy-mm-dd (string or null)",
+    },
 }
 
 CLAIM_TYPE_KEYWORDS = {
@@ -80,6 +97,7 @@ CLAIM_TYPE_KEYWORDS = {
     "parts_replacement": ["spare part", "part replacement", "rma", "part number", "defective part", "batch", "replacement part"],
     "transit_damage": ["transit", "transport", "consignment", "lr ", "delivery challan", "unloading", "damage during transport", "e-way"],
     "employee_reimbursement": ["reimbursement", "expense", "travel claim", "fuel", "toll", "hotel", "meal", "conveyance", "employee"],
+    "nepi_reimbursement": ["field service report", "fsr", "nepi service", "service commission", "no of calls", "commissioning & installation", "500 hrs service", "1500 hrs service", "ic ticket"],
 }
 
 EXTRACTION_INSTRUCTIONS = (

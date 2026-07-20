@@ -54,6 +54,9 @@ class ExtractionAgent(BaseAgent):
         fields = res.data["fields"]
         fields["claim_amount"] = self._to_number(fields.get("claim_amount"))
         ctype = self._normalise_type(fields.get("claim_type")) or guess
+        forced = context.get("forced_type")
+        if forced:
+            ctype = forced
         if ctype in supported_types():
             fields["claim_type"] = ctype
         else:
@@ -112,7 +115,10 @@ class ExtractionAgent(BaseAgent):
         if not value:
             return None
         v = str(value).strip().lower()
-        for t in supported_types():
+        types = supported_types()
+        if v in types:                       # exact match wins
+            return v
+        for t in sorted(types, key=len, reverse=True):  # most-specific substring next
             if t in v:
                 return t
         return None

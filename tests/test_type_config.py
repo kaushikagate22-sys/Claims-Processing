@@ -1,9 +1,9 @@
 """Config-driven type registry tests."""
 from domain.type_config import supported_types, extraction_schema_for
 
-NEW = {"warranty", "nepi", "parts_replacement", "transit_damage", "employee_reimbursement"}
+NEW = {"warranty", "nepi", "parts_replacement", "transit_damage", "employee_reimbursement", "nepi_reimbursement"}
 
-def test_supported_types_are_the_five_new_ones():
+def test_supported_types_match_config():
     assert set(supported_types()) == NEW
 
 def test_every_type_has_base_fields():
